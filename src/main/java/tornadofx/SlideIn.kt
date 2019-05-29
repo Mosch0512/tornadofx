@@ -30,7 +30,7 @@ abstract class SlideIn constructor(private val milliseconds: Double? = 50.0, pri
             prefWidth = Region.USE_COMPUTED_SIZE
             maxWidth = Region.USE_PREF_SIZE
         }
-        if (milliseconds != null && milliseconds >= 0.0) {
+        if (milliseconds != null && milliseconds > 0.0) {
             openSlide = TranslateTransition(Duration(milliseconds), this)
             closeSlide = TranslateTransition(Duration(milliseconds), this)
         }
@@ -130,7 +130,7 @@ abstract class SlideIn constructor(private val milliseconds: Double? = 50.0, pri
             Pos.TOP_LEFT, Pos.CENTER_LEFT, Pos.BASELINE_LEFT, Pos.BOTTOM_LEFT -> slideFromLeft()
             Pos.TOP_RIGHT, Pos.CENTER_RIGHT, Pos.BASELINE_RIGHT, Pos.BOTTOM_RIGHT -> slideFromRight()
             Pos.TOP_CENTER -> slideFromTop()
-            Pos.BOTTOM_CENTER -> slideFromBottom()
+            Pos.BOTTOM_CENTER, Pos.CENTER, Pos.BASELINE_CENTER -> slideFromBottom()
         }
     }
 
