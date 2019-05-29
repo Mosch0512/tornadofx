@@ -134,7 +134,7 @@ abstract class SlideIn constructor(private val milliseconds: Double? = 50.0, pri
         }
     }
 
-    fun menuOpenClose() {
+    fun slideInOpenClose() {
         if (milliseconds == null || milliseconds == 0.0) {
             instantOpenClose()
         } else {
