@@ -141,4 +141,33 @@ abstract class SlideIn constructor(private val milliseconds: Double? = 50.0, pri
             slideOpenClose()
         }
     }
+    
+    init {
+        this.currentWindow!!.sceneProperty().onChange {
+            this.currentWindow!!.sceneProperty().get().addEventFilter(MouseEvent.MOUSE_CLICKED) {
+                if(root.visibleProperty().get() && !isClicked(root, it.target)) {
+                    slideOpenClose()
+                }
+            }
+        }
+    }
+
+    private fun isClicked(node: Node, target: EventTarget): Boolean {
+        if(target == node) {
+            return true
+        }
+        else if (node.getChildList() != null && node.getChildList()!!.isNotEmpty()) {
+            if(node.getChildList()!!.contains(target)) {
+                return true
+            }
+            else {
+                for(it in node.getChildList()!!) {
+                    if (isClicked(it, target)) {
+                        return true
+                    }
+                }
+            }
+        }
+        return false
+    }
 }
