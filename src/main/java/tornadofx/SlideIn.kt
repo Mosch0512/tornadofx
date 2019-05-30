@@ -144,8 +144,15 @@ abstract class SlideIn constructor(private val milliseconds: Double? = 50.0, pri
     
     init {
         this.currentWindow!!.sceneProperty().onChange {
+            closeAtClickSomewhereElse()
+        }
+        closeAtClickSomewhereElse()
+    }
+
+    private fun closeAtClickSomewhereElse() {
+        if (this.currentWindow!!.sceneProperty().get() != null) {
             this.currentWindow!!.sceneProperty().get().addEventFilter(MouseEvent.MOUSE_CLICKED) {
-                if(root.visibleProperty().get() && !isClicked(root, it.target)) {
+                if (root.visibleProperty().get() && !isClicked(root, it.target)) {
                     slideOpenClose()
                 }
             }
@@ -153,15 +160,19 @@ abstract class SlideIn constructor(private val milliseconds: Double? = 50.0, pri
     }
 
     private fun isClicked(node: Node, target: EventTarget): Boolean {
-        if(target == node) {
-            return true
+        return if (target == node) {
+            true
+        } else {
+            isChildClicked(node, target)
         }
-        else if (node.getChildList() != null && node.getChildList()!!.isNotEmpty()) {
-            if(node.getChildList()!!.contains(target)) {
+    }
+
+    private fun isChildClicked(node: Node, target: EventTarget): Boolean {
+        if (node.getChildList() != null && node.getChildList()!!.isNotEmpty()) {
+            if (node.getChildList()!!.contains(target)) {
                 return true
-            }
-            else {
-                for(it in node.getChildList()!!) {
+            } else {
+                for (it in node.getChildList()!!) {
                     if (isClicked(it, target)) {
                         return true
                     }
