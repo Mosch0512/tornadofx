@@ -257,6 +257,7 @@ abstract class SlideIn : View {
             this.primaryStage.sceneProperty().get().addEventFilter(MouseEvent.MOUSE_CLICKED) {
                 if (root.visibleProperty().get() && !isClicked(root, it.target)) {
                     slideOpenClose()
+                    it.consume()
                 }
             }
         }
