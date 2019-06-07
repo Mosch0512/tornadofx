@@ -1,15 +1,114 @@
+@file:Suppress("unused")
 package tornadofx
 
 import javafx.animation.TranslateTransition
+import javafx.event.EventTarget
+import javafx.geometry.Point2D
 import javafx.geometry.Pos
+import javafx.scene.Node
+import javafx.scene.input.MouseEvent
 import javafx.scene.layout.Region
 import javafx.util.Duration
+import tornadofx.*
 
-abstract class SlideIn constructor(private val milliseconds: Double? = 50.0, private val size: Double? = null, private var position: Pos = Pos.TOP_RIGHT) : View() {
+abstract class SlideIn : View {
+
+    var milliseconds: Double = 100.00
+    var size: Point2D = Point2D(0.0, 0.0)
+    var position: Pos = Pos.TOP_RIGHT
+    var direction: Direction = Direction.RIGHT_TO_LEFT
+
+    constructor()
+
+    constructor(milliseconds: Double) {
+        this.milliseconds = milliseconds
+    }
+
+    constructor(size: Point2D) {
+        this.size = size
+    }
+
+    constructor(position: Pos) {
+        this.position = position
+    }
+
+    constructor(direction: Direction) {
+        this.direction = direction
+    }
+
+    constructor(milliseconds: Double, size: Point2D) {
+        this.milliseconds = milliseconds
+        this.size = size
+    }
+
+    constructor(milliseconds: Double, position: Pos) {
+        this.milliseconds = milliseconds
+        this.position = position
+    }
+
+    constructor(milliseconds: Double, direction: Direction) {
+        this.milliseconds = milliseconds
+        this.direction = direction
+    }
+
+    constructor(size: Point2D, position: Pos) {
+        this.size = size
+        this.position = position
+    }
+
+    constructor(size: Point2D, direction: Direction) {
+        this.size = size
+        this.direction = direction
+    }
+
+    constructor(position: Pos, direction: Direction) {
+        this.position = position
+        this.direction = direction
+    }
+
+    constructor(milliseconds: Double, size: Point2D, position: Pos) {
+        this.milliseconds = milliseconds
+        this.size = size
+        this.position = position
+    }
+
+    constructor(milliseconds: Double, size: Point2D, direction: Direction) {
+        this.milliseconds = milliseconds
+        this.size = size
+        this.direction = direction
+    }
+
+    constructor(milliseconds: Double, position: Pos, direction: Direction) {
+        this.milliseconds = milliseconds
+        this.position = position
+        this.direction = direction
+    }
+
+    constructor(size: Point2D, position: Pos, direction: Direction) {
+        this.size = size
+        this.position = position
+        this.direction = direction
+    }
+
+    constructor(milliseconds: Double, size: Point2D, position: Pos, direction: Direction) {
+        this.milliseconds = milliseconds
+        this.size = size
+        this.position = position
+        this.direction = direction
+    }
+
+    enum class Direction {
+        LEFT_TO_RIGHT,
+        RIGHT_TO_LEFT,
+        TOP_TO_BOTTOM,
+        BOTTOM_TO_TOP
+    }
+
     private enum class Vertical {
         TOP,
         BOTTOM
     }
+
     private enum class Horizontal {
         Left,
         Right
@@ -19,12 +118,13 @@ abstract class SlideIn constructor(private val milliseconds: Double? = 50.0, pri
     private lateinit var closeSlide: TranslateTransition
     private var firstOpening = true
     override val root = vbox {
+        isCache = false
         maxHeight = Region.USE_PREF_SIZE
         stackpaneConstraints { alignment = position }
-        if (size != null && size >= 11.0) {
-            minWidth = size
-            prefWidth = size
-            maxWidth = size
+        if (size != null && size.x >= 11.0) {
+            minWidth = size.x
+            prefWidth = size.x
+            maxWidth = size.x
         } else {
             minWidth = Region.USE_COMPUTED_SIZE
             prefWidth = Region.USE_COMPUTED_SIZE
@@ -46,22 +146,24 @@ abstract class SlideIn constructor(private val milliseconds: Double? = 50.0, pri
 
     private fun slideFromLeftOrRight(horizontal: Horizontal) {
         var multiplier = 1.0
-        if(horizontal == Horizontal.Left) {
+        if (horizontal == Horizontal.Left) {
             multiplier = -1.0
         }
         if (root.translateX != 0.0 || firstOpening) {
             runAsync {
                 openSlide.toX = 0.0
+
             } ui {
-                if (firstOpening && size != null) {
-                    root.translateX = multiplier * size
-                    firstOpening = false
+                if (firstOpening && size.x > 0.0) {
+                    root.translateX = multiplier * size.x
                 } else {
                     root.translateX = multiplier * 350.0
                 }
                 root.visibleProperty().set(true)
                 openSlide.play()
+                firstOpening = false
             }
+
         } else {
             runAsync {
                 closeSlide.toX = multiplier * root.boundsInLocal.width
@@ -84,23 +186,24 @@ abstract class SlideIn constructor(private val milliseconds: Double? = 50.0, pri
 
     private fun slideFromTopOrBottom(vertical: Vertical) {
         var multiplier = 1.0
-        if(vertical == Vertical.TOP) {
+        if (vertical == Vertical.TOP) {
             multiplier = -1.0
         }
         if (root.translateY != 0.0 || firstOpening) {
             runAsync {
                 openSlide.toY = 0.0
+
             } ui {
-                if (firstOpening && size != null) {
-                    root.translateY = multiplier * size
-                    firstOpening = false
+                if (firstOpening && size.y > 0.0) {
+                    root.translateY = multiplier * size.y
                 } else {
                     root.translateY = multiplier * 350.0
                 }
                 root.visibleProperty().set(true)
                 openSlide.play()
-
+                firstOpening = false
             }
+
         } else {
             runAsync {
                 closeSlide.toY = multiplier * root.boundsInLocal.height
@@ -126,11 +229,11 @@ abstract class SlideIn constructor(private val milliseconds: Double? = 50.0, pri
     }
 
     private fun slideOpenClose() {
-        when(position) {
-            Pos.TOP_LEFT, Pos.CENTER_LEFT, Pos.BASELINE_LEFT, Pos.BOTTOM_LEFT -> slideFromLeft()
-            Pos.TOP_RIGHT, Pos.CENTER_RIGHT, Pos.BASELINE_RIGHT, Pos.BOTTOM_RIGHT -> slideFromRight()
-            Pos.TOP_CENTER -> slideFromTop()
-            Pos.BOTTOM_CENTER, Pos.CENTER, Pos.BASELINE_CENTER -> slideFromBottom()
+        when (direction) {
+            Direction.LEFT_TO_RIGHT -> slideFromLeft()
+            Direction.RIGHT_TO_LEFT -> slideFromRight()
+            Direction.TOP_TO_BOTTOM -> slideFromTop()
+            Direction.BOTTOM_TO_TOP -> slideFromBottom()
         }
     }
 
@@ -141,17 +244,17 @@ abstract class SlideIn constructor(private val milliseconds: Double? = 50.0, pri
             slideOpenClose()
         }
     }
-    
+
     init {
-        this.currentWindow!!.sceneProperty().onChange {
+        this.primaryStage.sceneProperty().onChange {
             closeAtClickSomewhereElse()
         }
         closeAtClickSomewhereElse()
     }
 
     private fun closeAtClickSomewhereElse() {
-        if (this.currentWindow!!.sceneProperty().get() != null) {
-            this.currentWindow!!.sceneProperty().get().addEventFilter(MouseEvent.MOUSE_CLICKED) {
+        if (this.primaryStage.sceneProperty().get() != null) {
+            this.primaryStage.sceneProperty().get().addEventFilter(MouseEvent.MOUSE_CLICKED) {
                 if (root.visibleProperty().get() && !isClicked(root, it.target)) {
                     slideOpenClose()
                 }
