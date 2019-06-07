@@ -17,77 +17,98 @@ abstract class SlideIn : View {
     var size: Point2D = Point2D(0.0, 0.0)
     var position: Pos = Pos.TOP_RIGHT
     var direction: Direction = Direction.RIGHT_TO_LEFT
+    private lateinit var openSlide: TranslateTransition
+    private lateinit var closeSlide: TranslateTransition
+    private var firstOpening = true
 
-    constructor()
+    override val root = vbox ()
+
+    constructor() {
+        createSlide()
+    }
 
     constructor(milliseconds: Double) {
         this.milliseconds = milliseconds
+        createSlide()
     }
 
     constructor(size: Point2D) {
         this.size = size
+        createSlide()
     }
 
     constructor(position: Pos) {
         this.position = position
+        createSlide()
     }
 
     constructor(direction: Direction) {
         this.direction = direction
+        createSlide()
     }
 
     constructor(milliseconds: Double, size: Point2D) {
         this.milliseconds = milliseconds
         this.size = size
+        createSlide()
     }
 
     constructor(milliseconds: Double, position: Pos) {
         this.milliseconds = milliseconds
         this.position = position
+        createSlide()
     }
 
     constructor(milliseconds: Double, direction: Direction) {
         this.milliseconds = milliseconds
         this.direction = direction
+        createSlide()
     }
 
     constructor(size: Point2D, position: Pos) {
         this.size = size
         this.position = position
+        createSlide()
     }
 
     constructor(size: Point2D, direction: Direction) {
         this.size = size
         this.direction = direction
+        createSlide()
     }
 
     constructor(position: Pos, direction: Direction) {
         this.position = position
         this.direction = direction
+        createSlide()
     }
 
     constructor(milliseconds: Double, size: Point2D, position: Pos) {
         this.milliseconds = milliseconds
         this.size = size
         this.position = position
+        createSlide()
     }
 
     constructor(milliseconds: Double, size: Point2D, direction: Direction) {
         this.milliseconds = milliseconds
         this.size = size
         this.direction = direction
+        createSlide()
     }
 
     constructor(milliseconds: Double, position: Pos, direction: Direction) {
         this.milliseconds = milliseconds
         this.position = position
         this.direction = direction
+        createSlide()
     }
 
     constructor(size: Point2D, position: Pos, direction: Direction) {
         this.size = size
         this.position = position
         this.direction = direction
+        createSlide()
     }
 
     constructor(milliseconds: Double, size: Point2D, position: Pos, direction: Direction) {
@@ -95,6 +116,7 @@ abstract class SlideIn : View {
         this.size = size
         this.position = position
         this.direction = direction
+        createSlide()
     }
 
     enum class Direction {
@@ -104,49 +126,9 @@ abstract class SlideIn : View {
         BOTTOM_TO_TOP
     }
 
-    private enum class Vertical {
-        TOP,
-        BOTTOM
-    }
-
-    private enum class Horizontal {
-        Left,
-        Right
-    }
-
-    private lateinit var openSlide: TranslateTransition
-    private lateinit var closeSlide: TranslateTransition
-    private var firstOpening = true
-    override val root = vbox {
-        isCache = false
-        maxHeight = Region.USE_PREF_SIZE
-        stackpaneConstraints { alignment = position }
-        if (size != null && size.x >= 11.0) {
-            minWidth = size.x
-            prefWidth = size.x
-            maxWidth = size.x
-        } else {
-            minWidth = Region.USE_COMPUTED_SIZE
-            prefWidth = Region.USE_COMPUTED_SIZE
-            maxWidth = Region.USE_PREF_SIZE
-        }
-        if (milliseconds != null && milliseconds > 0.0) {
-            openSlide = TranslateTransition(Duration(milliseconds), this)
-            closeSlide = TranslateTransition(Duration(milliseconds), this)
-        }
-        translateX = boundsInLocal.width
-        visibleProperty().set(false)
-        managedProperty().bind(visibleProperty())
-        disableProperty().bind(!managedProperty())
-    }
-
-    private fun slideFromLeft() {
-        slideFromLeftOrRight(Horizontal.Left)
-    }
-
-    private fun slideFromLeftOrRight(horizontal: Horizontal) {
+    private fun slideFromLeftOrRight() {
         var multiplier = 1.0
-        if (horizontal == Horizontal.Left) {
+        if (direction == Direction.LEFT_TO_RIGHT) {
             multiplier = -1.0
         }
         if (root.translateX != 0.0 || firstOpening) {
@@ -154,8 +136,8 @@ abstract class SlideIn : View {
                 openSlide.toX = 0.0
 
             } ui {
-                if (firstOpening && size.x > 0.0) {
-                    root.translateX = multiplier * size.x
+                if (firstOpening && size!!.x > 0.0) {
+                    root.translateX = multiplier * size!!.x
                 } else {
                     root.translateX = multiplier * 350.0
                 }
@@ -176,17 +158,9 @@ abstract class SlideIn : View {
         }
     }
 
-    private fun slideFromRight() {
-        slideFromLeftOrRight(Horizontal.Right)
-    }
-
-    private fun slideFromTop() {
-        slideFromTopOrBottom(Vertical.TOP)
-    }
-
-    private fun slideFromTopOrBottom(vertical: Vertical) {
+    private fun slideFromTopOrBottom() {
         var multiplier = 1.0
-        if (vertical == Vertical.TOP) {
+        if (direction == Direction.TOP_TO_BOTTOM) {
             multiplier = -1.0
         }
         if (root.translateY != 0.0 || firstOpening) {
@@ -194,8 +168,8 @@ abstract class SlideIn : View {
                 openSlide.toY = 0.0
 
             } ui {
-                if (firstOpening && size.y > 0.0) {
-                    root.translateY = multiplier * size.y
+                if (firstOpening && size!!.y > 0.0) {
+                    root.translateY = multiplier * size!!.y
                 } else {
                     root.translateY = multiplier * 350.0
                 }
@@ -216,10 +190,6 @@ abstract class SlideIn : View {
         }
     }
 
-    private fun slideFromBottom() {
-        slideFromTopOrBottom(Vertical.BOTTOM)
-    }
-
     private fun instantOpenClose() {
         if (root.visibleProperty().get()) {
             root.visibleProperty().set(false)
@@ -230,10 +200,8 @@ abstract class SlideIn : View {
 
     private fun slideOpenClose() {
         when (direction) {
-            Direction.LEFT_TO_RIGHT -> slideFromLeft()
-            Direction.RIGHT_TO_LEFT -> slideFromRight()
-            Direction.TOP_TO_BOTTOM -> slideFromTop()
-            Direction.BOTTOM_TO_TOP -> slideFromBottom()
+            Direction.LEFT_TO_RIGHT, Direction.RIGHT_TO_LEFT -> slideFromLeftOrRight()
+            Direction.TOP_TO_BOTTOM, Direction.BOTTOM_TO_TOP -> slideFromTopOrBottom()
         }
     }
 
@@ -250,6 +218,31 @@ abstract class SlideIn : View {
             closeAtClickSomewhereElse()
         }
         closeAtClickSomewhereElse()
+    }
+
+    private fun createSlide() {
+        with(root) {
+            maxHeight = Region.USE_PREF_SIZE
+            stackpaneConstraints { alignment = position }
+            println(position.toString())
+            if (size != null && size.x >= 11.0) {
+                minWidth = size.x
+                prefWidth = size.x
+                maxWidth = size.x
+            } else {
+                minWidth = Region.USE_COMPUTED_SIZE
+                prefWidth = Region.USE_COMPUTED_SIZE
+                maxWidth = Region.USE_PREF_SIZE
+            }
+            if (milliseconds != null && milliseconds > 0.0) {
+                openSlide = TranslateTransition(Duration(milliseconds), this)
+                closeSlide = TranslateTransition(Duration(milliseconds), this)
+            }
+            translateX = boundsInLocal.width
+            visibleProperty().set(false)
+            managedProperty().bind(visibleProperty())
+            disableProperty().bind(!managedProperty())
+        }
     }
 
     private fun closeAtClickSomewhereElse() {
